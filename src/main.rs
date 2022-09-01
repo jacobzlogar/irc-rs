@@ -275,21 +275,3 @@ async fn main() {
 
     bot.spawn_handles().await;
 }
-// <> so, first actual issue is that, while u will probably never run into this on irc, you are just taking in the result of one read call (ie syscall) as if
-//                 its a complete line
-// < ~> which is not correct, since technically a line could come in across multiple calls
-// < ~> what you would actually have to do is maintaina  buffer and wait until there's a newline in there, and then cut that out to yield it
-// >> OpenURL 7
-// < ~> thankfully tokio provides https://docs.rs/tokio/latest/tokio/io/struct.BufReader.html which lets you use methods from
-//                 https://docs.rs/tokio/latest/tokio/io/trait.AsyncBufReadExt.html
-// < > Title: BufReader in tokio::io - Rust (1.22s)
-// < ~> so you can actually just iterator over .lines() and get real lines from your ReadHalf
-// < ~> iterate
-// < ~> btw on the connect() remark, note that https://docs.rs/tokio/latest/tokio/net/struct.TcpStream.html#method.connect takes
-//                 https://docs.rs/tokio/latest/tokio/net/trait.ToSocketAddrs.html which is implemented for a bunch of stuff
-// < > Title: TcpStream in tokio::net - Rust (1.61s)
-// < > yea the read_line from AsyncBufReadExt is def what u want
-// < ~> so you could have the whole address + port as a string, or a (String, u16)
-// < ~> etc
-// < > or w/e the liens iterator
-//https://docs.rs/tokio-util/latest/tokio_util/codec/struct.LinesCodec.html
